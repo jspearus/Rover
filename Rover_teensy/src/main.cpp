@@ -14,15 +14,15 @@ String Data_In = "";
 String Dest = "";
 String Datatype = "";
 String Data = "";
-int joyY = 0;
-int joyX =0;
+int Throttle = 0;
+int Steering =0;
 
 boolean dataComplete = false;
 
 void SerialParser(String Com);
 void serialEvent1();
 
-void dirControl(String leftDir, int lSpeed, String rightDir, int rSpeed, int time);
+void dirControl(int lSpeed, int rSpeed, int time);
 void mForward(int speed, int time);
 void mBackward(int speed, int time);
 void mLeft(int speed, int time);
@@ -57,33 +57,57 @@ void loop()
 	}
   else{
     boolean zButton = nchuk.buttonZ();
-    joyX = nchuk.joyX();
-    joyY = nchuk.joyY();
-    // Serial.print(joyX);
+    Steering = nchuk.joyX();
+    Throttle = nchuk.joyY();
+    Steering = map(Steering, 0, 256, -100, 100);
+    Throttle = map(Throttle, 0, 256, -100, 100);
+
+    // Serial.print(Throttle);  //forward 255 back -255
     // Serial.print(" ");
-    // Serial.print(joyY);
+    // Serial.print(Steering);  // left -255right 255
     // Serial.print(" ");
     // Serial.println(zButton);
-  }
-  if(joyY > 140){
-    mForward(100, 250);
-  }
-  else if(joyY < 120){
-    mBackward(100, 250);
-  }
-  else if(joyX > 140){
-    mRight(100, 250);
-  }
-  else if(joyX < 120){
-    mLeft(100, 250);
-  }
 
+    int leftSpeed = Throttle + Steering; 
+    int rightSpeed = Throttle - Steering; 
+    dirControl(leftSpeed, rightSpeed, 0);
+    if(zButton == true){
+      mStop();
+    }
+  }
   delay(10);
 }
 
-void dirControl(String leftDir, int lSpeed, String rightDir, int rSpeed, int time){
-
+void dirControl(int lSpeed, int rSpeed, int time = 0){
   //Direct control function
+  lMotorController.Enable();
+  rMotorController.Enable();
+  constrain(lSpeed, -100, 100);
+  constrain(rSpeed, -100, 100);
+  if (lSpeed > 0){
+    lMotorController.TurnRight(lSpeed);
+  }
+  else if (lSpeed < 0){
+    lSpeed = map(lSpeed, 0, -100, 0, 100);
+    constrain(lSpeed, 0, 100);
+    lMotorController.TurnLeft(lSpeed);
+  }
+  if (rSpeed > 0){
+    rMotorController.TurnLeft(rSpeed);
+  }
+  else if (rSpeed < 0){
+    rSpeed = map(rSpeed, 0, -100, 0, 100);
+    constrain(rSpeed, 0, 100);
+    rMotorController.TurnRight(rSpeed);
+  }
+  if(lSpeed == 0 && rSpeed == 0){
+    mStop();
+  }
+  if(time > 0){
+    delay(time);
+    mStop();
+  }
+  
 }
 
 void mForward(int speed, int time){
