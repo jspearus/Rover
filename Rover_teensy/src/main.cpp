@@ -22,6 +22,7 @@ boolean dataComplete = false;
 void SerialParser(String Com);
 void serialEvent1();
 
+void dirControl(String leftDir, int lSpeed, String rightDir, int rSpeed, int time);
 void mForward(int speed, int time);
 void mBackward(int speed, int time);
 void mLeft(int speed, int time);
@@ -78,6 +79,11 @@ void loop()
   }
 
   delay(10);
+}
+
+void dirControl(String leftDir, int lSpeed, String rightDir, int rSpeed, int time){
+
+  //Direct control function
 }
 
 void mForward(int speed, int time){
