@@ -84,22 +84,25 @@ void dirControl(int lSpeed, int rSpeed, int time = 0){
   rMotorController.Enable();
   constrain(lSpeed, -100, 100);
   constrain(rSpeed, -100, 100);
-  if (lSpeed > 0){
+  if (lSpeed > 5){
     lMotorController.TurnRight(lSpeed);
   }
-  else if (lSpeed < 0){
+  else if (lSpeed < -5){
     lSpeed = map(lSpeed, 0, -100, 0, 100);
     constrain(lSpeed, 0, 100);
     lMotorController.TurnLeft(lSpeed);
   }
-  if (rSpeed > 0){
+  else{lSpeed = 0;}
+  if (rSpeed > 5){
     rMotorController.TurnLeft(rSpeed);
   }
-  else if (rSpeed < 0){
+  else if (rSpeed < -5){
     rSpeed = map(rSpeed, 0, -100, 0, 100);
     constrain(rSpeed, 0, 100);
     rMotorController.TurnRight(rSpeed);
   }
+  else{rSpeed = 0;}
+
   if(lSpeed == 0 && rSpeed == 0){
     mStop();
   }
