@@ -13,7 +13,7 @@ class RoverControl():
 
   def Serial_out(self):
         led_on = input('Do you want the LED on? ')[0]
-        if led_on in 'yY':
+        if led_on == 'y':
             ser.write(str.encode('test#\n'))
         if led_on in 'Nn':
             ser.write(bytes('NO\n','utf-8')) 

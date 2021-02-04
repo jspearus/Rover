@@ -11,9 +11,9 @@ const uint8_t R_L_PWM = 21;
 const uint8_t R_R_PWM = 22;
 
 String Data_In = "";
-String Dest = "";
-String Datatype = "";
-String Data = "";
+String Type = "";
+String Data_A = "";
+String Data_B = "";
 
 int Throttle = 0;
 int Steering =0;
@@ -28,12 +28,10 @@ boolean zButton = false;
 
 void SerialParser(String Com);
 void serialEvent1();
+void serialEvent();
 
 void dirControl(int lSpeed, int rSpeed);
-void mForward(int speed, int time);
-void mBackward(int speed, int time);
-void mLeft(int speed, int time);
-void mRight(int speed, int time);
+void dynamicControl(int throttle, int steering);
 void mStop();
 
 BTS7960 lMotorController(L_EN, L_L_PWM, L_R_PWM);
@@ -42,8 +40,8 @@ Nunchuk nchuk;
 
 void setup() 
 {
-  Serial1.begin(9600);
-  Serial.begin(9600);
+  Serial1.begin(9600); //From XBEE
+  Serial.begin(9600); //From NANO
   nchuk.begin();
   delay(500);
   Serial1.println("Xbee Online!");
@@ -69,9 +67,9 @@ void loop()
     Steering = map(Steering, 0, 256, maxNegSpeed, maxSpeed);
     Throttle = map(Throttle, 0, 256, maxNegSpeed, maxSpeed);
 
-    // Serial.print(Throttle);  //forward 255 back -255
+    // Serial.print(Throttle);  
     // Serial.print(" ");
-    // Serial.print(Steering);  // left -255right 255
+    // Serial.print(Steering);  
     // Serial.print(" ");
     // Serial.println(zButton);
 
@@ -126,59 +124,10 @@ void dirControl(int lSpeed, int rSpeed){
   
 }
 
-void mForward(int speed, int time){
-  lMotorController.Enable();
-  rMotorController.Enable();
-   for(int i = 0 ; i < speed; i+=10)
-  {
-	lMotorController.TurnRight(i);
-  rMotorController.TurnLeft(i);
-	delay(100);
-  }
-  delay(time);
-  mStop();
-}
-
-void mBackward(int speed, int time){
-  //Serial.println("back");
-  lMotorController.Enable();
-  rMotorController.Enable();
-   for(int i = 0 ; i < speed; i+=10)
-  {
-	rMotorController.TurnRight(i);
-  lMotorController.TurnLeft(i);
-	delay(100);
-  }
-  delay(time);
-  mStop();
-}
-
-void mLeft(int speed, int time){
-  //Serial.println("Left");
-  lMotorController.Enable();
-  rMotorController.Enable();
-   for(int i = 0 ; i < speed; i+=10)
-  {
-	rMotorController.TurnLeft(i);
-  lMotorController.TurnLeft(i);
-	delay(100);
-  }
-  delay(time);
-  mStop();
-}
-
-void mRight(int speed, int time){
-  //Serial.println("Right");
-  lMotorController.Enable();
-  rMotorController.Enable();
-   for(int i = 0 ; i < speed; i+=10)
-  {
-	rMotorController.TurnRight(i);
-  lMotorController.TurnRight(i);
-	delay(100);
-  }
-  delay(time);
-  mStop();
+void dynamicControl(int throttle, int steering){
+  int leftSpeed = throttle + steering; 
+  int rightSpeed = throttle - steering; 
+  dirControl(leftSpeed, rightSpeed);
 }
 
 void mStop(){
@@ -188,7 +137,7 @@ void mStop(){
   rMotorController.Disable();
 }
 
-void serialEvent1() { //Debug Comm
+void serialEvent1() { //From XBEE
   while (Serial1.available()) {
     // add it to the inputString:
     Data_In = Serial1.readStringUntil('#');
@@ -198,37 +147,30 @@ void serialEvent1() { //Debug Comm
     dataComplete = true;
   }
 }
+void serialEvent() { //From NANO
+  while (Serial.available()) {
+    // add it to the inputString:
+    Data_In = Serial.readStringUntil('#');
+    SerialParser(Data_In);
+    //Serial1.println(Data_In);
+  }
+}
 
 void SerialParser(String Com) {
-  Dest = Com.substring(0, Com.indexOf("@"));
-  Datatype = Com.substring(Com.indexOf("@") + 1, Com.indexOf("-"));
-  Data = Com.substring(Com.indexOf("-") + 1, Com.indexOf("#"));
+  Type = Com.substring(0, Com.indexOf("@"));
+  Data_A = Com.substring(Com.indexOf("@") + 1, Com.indexOf("-"));
+  Data_B = Com.substring(Com.indexOf("-") + 1, Com.indexOf("#"));
   // Serial1.println("Data parsed");
   // Serial1.println(Dest);
   // Serial1.println(Datatype);
   // Serial1.println(Data);
-  if (Dest == "rover"){
-    if (Datatype == "move"){
-      if (Data == "f"){
-        Serial1.println("Moving Forward");
-        mForward(75, 500);
-      }
-      else if (Data == "b"){
-        Serial1.println("Moving Backward");
-        mBackward(75, 500);
-      }
-      else if (Data == "l"){
-        Serial1.println("Moving Left");
-        mLeft(75, 500);
-      }
-      else if (Data == "r"){
-        Serial1.println("Moving Right");
-        mRight(75, 500);
-      }
-    }
+  if (Type == "move"){
+    dynamicControl(Data_A.toInt(), Data_B.toInt());
     Data_In = "";
-    Dest = "";
-    Datatype = "";
-    Data = "";
+    Type = "";
+    Data_A = "";
+    Data_B = "";
+    dataComplete = false;
+
   }
 }
