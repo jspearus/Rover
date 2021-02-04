@@ -14,15 +14,22 @@ String Data_In = "";
 String Dest = "";
 String Datatype = "";
 String Data = "";
+
 int Throttle = 0;
 int Steering =0;
+int minSpeed = 0;
+int maxSpeed = 100;
+int maxNegSpeed = -100;
+int deadZone= 5;
+int speedOffset = 5;
 
 boolean dataComplete = false;
+boolean zButton = false;
 
 void SerialParser(String Com);
 void serialEvent1();
 
-void dirControl(int lSpeed, int rSpeed, int time);
+void dirControl(int lSpeed, int rSpeed);
 void mForward(int speed, int time);
 void mBackward(int speed, int time);
 void mLeft(int speed, int time);
@@ -56,11 +63,11 @@ void loop()
 		delay(1000);
 	}
   else{
-    boolean zButton = nchuk.buttonZ();
+    zButton = nchuk.buttonZ();
     Steering = nchuk.joyX();
     Throttle = nchuk.joyY();
-    Steering = map(Steering, 0, 256, -100, 100);
-    Throttle = map(Throttle, 0, 256, -100, 100);
+    Steering = map(Steering, 0, 256, maxNegSpeed, maxSpeed);
+    Throttle = map(Throttle, 0, 256, maxNegSpeed, maxSpeed);
 
     // Serial.print(Throttle);  //forward 255 back -255
     // Serial.print(" ");
@@ -70,44 +77,50 @@ void loop()
 
     int leftSpeed = Throttle + Steering; 
     int rightSpeed = Throttle - Steering; 
-    dirControl(leftSpeed, rightSpeed, 0);
+    dirControl(leftSpeed, rightSpeed);
+
     if(zButton == true){
-      mStop();
+      while(zButton == true){
+        mStop();
+        nchuk.update(); 
+        zButton = nchuk.buttonZ();
+        delay(10);
+      }
+      
     }
   }
   delay(10);
 }
 
-void dirControl(int lSpeed, int rSpeed, int time = 0){
+void dirControl(int lSpeed, int rSpeed){
   //Direct control function
   lMotorController.Enable();
   rMotorController.Enable();
-  constrain(lSpeed, -100, 100);
-  constrain(rSpeed, -100, 100);
-  if (lSpeed > 5){
-    lMotorController.TurnRight(lSpeed);
+
+  constrain(lSpeed, maxNegSpeed, maxSpeed);
+  constrain(rSpeed, maxNegSpeed, maxSpeed);
+
+  if (lSpeed > deadZone){
+    lMotorController.TurnRight(lSpeed + speedOffset);
   }
-  else if (lSpeed < -5){
-    lSpeed = map(lSpeed, 0, -100, 0, 100);
-    constrain(lSpeed, 0, 100);
-    lMotorController.TurnLeft(lSpeed);
+  else if (lSpeed < -deadZone){
+    lSpeed = map(lSpeed, minSpeed, maxNegSpeed, minSpeed, maxSpeed);
+    constrain(lSpeed, minSpeed, maxSpeed);
+    lMotorController.TurnLeft(lSpeed + speedOffset);
   }
   else{lSpeed = 0;}
-  if (rSpeed > 5){
+
+  if (rSpeed > deadZone){
     rMotorController.TurnLeft(rSpeed);
   }
-  else if (rSpeed < -5){
-    rSpeed = map(rSpeed, 0, -100, 0, 100);
-    constrain(rSpeed, 0, 100);
+  else if (rSpeed < -deadZone){
+    rSpeed = map(rSpeed, minSpeed, maxNegSpeed, minSpeed, maxSpeed);
+    constrain(rSpeed, minSpeed, maxSpeed);
     rMotorController.TurnRight(rSpeed);
   }
   else{rSpeed = 0;}
 
   if(lSpeed == 0 && rSpeed == 0){
-    mStop();
-  }
-  if(time > 0){
-    delay(time);
     mStop();
   }
   
