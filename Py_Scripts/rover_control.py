@@ -14,18 +14,13 @@ class RoverControl():
   def Serial_out(self):
      while True:
         Throttle = input('Enter Throttle? -100 to 100 ')
+        if Throttle == 'q':
+          print("Script ended")
+          break
         Steering = input('Enter Steering? -100 to 100 ')
-        arduino.write(bytes('move@','utf-8')) 
-        arduino.write(bytes(Throttle,'utf-8'))
-        arduino.write(bytes('-', 'utf-8')) 
-        arduino.write(bytes(Steering,'utf-8'))
-        arduino.write(bytes('#\n','utf-8')) 
+        arduino.write(bytes('move@','utf-8') + bytes(Throttle,'utf-8') + bytes('-', 'utf-8') + bytes(Steering,'utf-8') + bytes('#\n','utf-8')) 
         time.sleep(1)
-        arduino.write(bytes('move@','utf-8')) 
-        arduino.write(bytes('0','utf-8'))
-        arduino.write(bytes('-', 'utf-8')) 
-        arduino.write(bytes('0','utf-8'))
-        arduino.write(bytes('#\n','utf-8')) 
+        arduino.write(bytes('move@','utf-8') + bytes('0', 'utf-8') + bytes('-', 'utf-8') + bytes('0','utf-8') + bytes('#\n','utf-8')) 
         print("rover Stopped")
 
 
