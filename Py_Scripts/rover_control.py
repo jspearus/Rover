@@ -15,7 +15,7 @@ class RoverControl():
      while True:
         Throttle = input('Enter Throttle? -100 to 100 ')
         if Throttle == 'q':
-          print("Script ended")
+          print("Script Finished")
           break
         Steering = input('Enter Steering? -100 to 100 ')
         arduino.write(bytes('move@','utf-8') + bytes(Throttle,'utf-8') + bytes('-', 'utf-8') + bytes(Steering,'utf-8') + bytes('#\n','utf-8')) 
