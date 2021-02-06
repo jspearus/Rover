@@ -27,8 +27,10 @@ boolean dataComplete = false;
 boolean zButton = false;
 
 void SerialParser(String Com);
-void serialEvent1();
 void serialEvent();
+void serialEvent1();
+void serialEvent2();
+
 
 void dirControl(int lSpeed, int rSpeed);
 void dynamicControl(int throttle, int steering);
@@ -41,6 +43,8 @@ Nunchuk nchuk;
 void setup() 
 {
   Serial1.begin(9600); //From XBEE
+  // working out witch one will work
+  Serial2.begin(9600); //From NANO
   Serial.begin(9600); //From NANO
   nchuk.begin();
   delay(500);
@@ -67,11 +71,11 @@ void loop()
     Steering = map(Steering, 0, 256, maxNegSpeed, maxSpeed);
     Throttle = map(Throttle, 0, 256, maxNegSpeed, maxSpeed);
 
-    // Serial.print(Throttle);  
-    // Serial.print(" ");
-    // Serial.print(Steering);  
-    // Serial.print(" ");
-    // Serial.println(zButton);
+    Serial.print(Throttle);  
+    Serial.print(" ");
+    Serial.print(Steering);  
+    Serial.print(" ");
+    Serial.println(zButton);
 
     int leftSpeed = Throttle + Steering; 
     int rightSpeed = Throttle - Steering; 
@@ -153,17 +157,27 @@ void serialEvent() { //From NANO
     Data_In = Serial.readStringUntil('#');
     SerialParser(Data_In);
     //Serial1.println(Data_In);
+    dataComplete = true;
+  }
+}
+void serialEvent2() { //From NANO
+  while (Serial2.available()) {
+    // add it to the inputString:
+    Data_In = Serial2.readStringUntil('#');
+    SerialParser(Data_In);
+    //Serial1.println(Data_In);
+    dataComplete = true;
   }
 }
 
 void SerialParser(String Com) {
   Type = Com.substring(0, Com.indexOf("@"));
-  Data_A = Com.substring(Com.indexOf("@") + 1, Com.indexOf("-"));
-  Data_B = Com.substring(Com.indexOf("-") + 1, Com.indexOf("#"));
+  Data_A = Com.substring(Com.indexOf("@") + 1, Com.indexOf("$"));
+  Data_B = Com.substring(Com.indexOf("$") + 1, Com.indexOf("#"));
   // Serial1.println("Data parsed");
-  // Serial1.println(Dest);
-  // Serial1.println(Datatype);
-  // Serial1.println(Data);
+  // Serial1.println(Type);
+  // Serial1.println(Data_A);
+  // Serial1.println(Data_B);
   if (Type == "move"){
     dynamicControl(Data_A.toInt(), Data_B.toInt());
     Data_In = "";
