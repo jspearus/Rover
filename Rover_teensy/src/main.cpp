@@ -43,9 +43,8 @@ Nunchuk nchuk;
 void setup() 
 {
   Serial1.begin(9600); //From XBEE
-  // working out witch one will work
   Serial2.begin(9600); //From NANO
-  Serial.begin(9600); //From NANO
+  Serial.begin(9600); //From Desktop == Debug/program
   nchuk.begin();
   delay(500);
   Serial1.println("Xbee Online!");
@@ -60,8 +59,8 @@ void loop()
 {
   boolean success = nchuk.update();  // Get new data from the controller
 
-	if (!success) {  // Ruh roh
-		Serial1.println("Controller disconnected!");
+	if (!success) {  // Lost conection with controller
+		Serial1.println("Nunchuk  disconnected!");
 		delay(1000);
 	}
   else{
@@ -151,11 +150,11 @@ void serialEvent1() { //From XBEE
     dataComplete = true;
   }
 }
-void serialEvent() { //From NANO
+void serialEvent() { //From Desktop == Debug/program
   while (Serial.available()) {
     // add it to the inputString:
     Data_In = Serial.readStringUntil('#');
-    SerialParser(Data_In);
+    //SerialParser(Data_In);
     //Serial1.println(Data_In);
     dataComplete = true;
   }
@@ -174,7 +173,7 @@ void SerialParser(String Com) {
   Type = Com.substring(0, Com.indexOf("@"));
   Data_A = Com.substring(Com.indexOf("@") + 1, Com.indexOf("$"));
   Data_B = Com.substring(Com.indexOf("$") + 1, Com.indexOf("#"));
-  // Serial1.println("Data parsed");
+  //Serial1.println("Data parsed");
   // Serial1.println(Type);
   // Serial1.println(Data_A);
   // Serial1.println(Data_B);
