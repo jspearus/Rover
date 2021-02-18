@@ -1,9 +1,12 @@
-from rover_control import RoverControl
+#from rover_control import RoverControl
+from lidar_Nav import lidarNav
 
-rc = RoverControl()
+#rc = RoverControl()
+ln = lidarNav()
 
 print("Rover Terminal Control")
 
 
 
-rc.Serial_out()
+#rc.Serial_out()
+ln.getInfo()
