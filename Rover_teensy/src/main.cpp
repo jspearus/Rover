@@ -112,12 +112,12 @@ void dirControl(int lSpeed, int rSpeed){
   else{lSpeed = 0;}
 
   if (rSpeed > deadZone){
-    rMotorController.TurnLeft(rSpeed);
+    rMotorController.TurnRight(rSpeed);
   }
   else if (rSpeed < -deadZone){
     rSpeed = map(rSpeed, minSpeed, maxNegSpeed, minSpeed, maxSpeed);
     constrain(rSpeed, minSpeed, maxSpeed);
-    rMotorController.TurnRight(rSpeed);
+    rMotorController.TurnLeft(rSpeed);
   }
   else{rSpeed = 0;}
 
