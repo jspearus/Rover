@@ -1,14 +1,16 @@
 from rover_control import RoverControl
-#from lidar_Nav import lidarNav
+from Lidar import lidarNav
+import time
 
 
 rc = RoverControl()
-# ln = lidarNav()
+ln = lidarNav()
 
 print("Rover Terminal Control")
 
 
 
-rc.Serial_out()
-# ln.get_info()
-# ln.stopLidar()
+#rc.Serial_out()
+ln.startLidar()
+time.sleep(5)
+ln.stopLidar()
