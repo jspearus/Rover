@@ -25,6 +25,7 @@ int speedOffset = 5;
 
 boolean dataComplete = false;
 boolean zButton = false;
+boolean wiiControl = false;
 
 void SerialParser(String Com);
 void serialEvent();
@@ -48,7 +49,7 @@ void setup()
   nchuk.begin();
   delay(500);
   Serial1.println("Xbee Online!");
-  while (!nchuk.connect()) {
+  while (!nchuk.connect() && wiiControl == true) {
 		Serial1.println("Nunchuk not detected!");
 		delay(1000);
 	}
@@ -57,39 +58,44 @@ void setup()
 
 void loop() 
 {
-  boolean success = nchuk.update();  // Get new data from the controller
+  if (wiiControl == true){
+    boolean success = nchuk.update();  // Get new data from the controller
+  
 
-	if (!success) {  // Lost conection with controller
-		Serial1.println("Nunchuk  disconnected!");
-		delay(1000);
-	}
-  else{
-    zButton = nchuk.buttonZ();
-    Steering = nchuk.joyX();
-    Throttle = nchuk.joyY();
-    Steering = map(Steering, 0, 256, maxNegSpeed, maxSpeed);
-    Throttle = map(Throttle, 0, 256, maxNegSpeed, maxSpeed);
+    if (!success) {  // Lost conection with controller
+      Serial1.println("Nunchuk  disconnected!");
+      Serial1.println("Please reset motor Controller!");
+      delay(1000);
+    }
+    else{
+      zButton = nchuk.buttonZ();
+      Steering = nchuk.joyX();
+      Throttle = nchuk.joyY();
+      Steering = map(Steering, 0, 256, maxNegSpeed, maxSpeed);
+      Throttle = map(Throttle, 0, 256, maxNegSpeed, maxSpeed);
 
-    Serial.print(Throttle);  
-    Serial.print(" ");
-    Serial.print(Steering);  
-    Serial.print(" ");
-    Serial.println(zButton);
+      Serial.print(Throttle);  
+      Serial.print(" ");
+      Serial.print(Steering);  
+      Serial.print(" ");
+      Serial.println(zButton);
 
-    int leftSpeed = Throttle + Steering; 
-    int rightSpeed = Throttle - Steering; 
-    dirControl(leftSpeed, rightSpeed);
+      int leftSpeed = Throttle + Steering; 
+      int rightSpeed = Throttle - Steering; 
+      dirControl(leftSpeed, rightSpeed);
 
-    if(zButton == true){
-      while(zButton == true){
-        mStop();
-        nchuk.update(); 
-        zButton = nchuk.buttonZ();
-        delay(10);
+      if(zButton == true){
+        while(zButton == true){
+          mStop();
+          nchuk.update(); 
+          zButton = nchuk.buttonZ();
+          delay(10);
+        }
+        
       }
-      
     }
   }
+  
   delay(10);
 }
 
@@ -179,6 +185,22 @@ void SerialParser(String Com) {
   // Serial1.println(Data_B);
   if (Type == "move"){
     dynamicControl(Data_A.toInt(), Data_B.toInt());
+    Data_In = "";
+    Type = "";
+    Data_A = "";
+    Data_B = "";
+    dataComplete = false;
+
+  }
+  else if (Type == "mode"){
+    if(Data_A == "ne"){
+      Serial1.println("Nunchuk  enabled");
+      wiiControl = true;
+    }
+    else if(Data_A == "nd"){
+      Serial1.println("Nunchuk  disabled");
+      wiiControl = false;
+    }
     Data_In = "";
     Type = "";
     Data_A = "";
