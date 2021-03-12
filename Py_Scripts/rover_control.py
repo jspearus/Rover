@@ -15,9 +15,9 @@ class RoverControl():
     print("Initialized")  
 
 
-  def move_forward(self, speed, dist):
-    print("speed = ", speed)
-    print("distance = ", dist)
+  def move_Rover(self, Throttle, Steering):
+    SerPort.write(bytes('move@','utf-8') + bytes(Throttle,'utf-8') + bytes('$', 'utf-8') + bytes(Steering,'utf-8') + bytes('#\n','utf-8'))
+    
 
   def Serial_out(self):
      while True:
