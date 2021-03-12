@@ -21,7 +21,7 @@ while True:
         print("Finished")
         break
     rc.move_Rover(Throttle, Steering)
-    time.sleep(2)
+    time.sleep(2) # 1 sec dosen't work...2 sec does?
     print("Stopped")
     Throttle = '0'
     Steering = '0'
