@@ -15,7 +15,7 @@ class RoverControl():
     print("Initialized")  
 
 
-  def move_Rover(self, Throttle, Steerinng):
+  def move_Rover(self, Throttle, Steering):
     SerPort.write(bytes('move@','utf-8') + bytes(Throttle,'utf-8') + bytes('$', 'utf-8') + bytes(Steering,'utf-8') + bytes('#\n','utf-8'))
     
 
