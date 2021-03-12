@@ -10,7 +10,7 @@ print("Rover Terminal Control")
 
 
 
-#rc.Serial_out()
+#rc.Serial_out() # for debug and testing
 while True:
     Throttle = input("Enter Throttle: ")
     if Throttle == 'q':
