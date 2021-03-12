@@ -21,8 +21,11 @@ while True:
         print("Finished")
         break
     rc.move_Rover(Throttle, Steering)
-    time.sleep(1)
-    rc.move_Rover("0","0")
+    time.sleep(2)
+    print("Stopped")
+    Throttle = '0'
+    Steering = '0'
+    rc.move_Rover(Throttle, Steering)
 ln.startLidar()
 time.sleep(5)
 ln.stopLidar()
