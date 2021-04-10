@@ -156,6 +156,7 @@ void serialEvent1() { //From XBEE
     dataComplete = true;
   }
 }
+
 void serialEvent() { //From Desktop == Debug/program
   while (Serial.available()) {
     // add it to the inputString:
@@ -165,6 +166,7 @@ void serialEvent() { //From Desktop == Debug/program
     dataComplete = true;
   }
 }
+
 void serialEvent2() { //From NANO
   while (Serial2.available()) {
     // add it to the inputString:
